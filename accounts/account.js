@@ -2,17 +2,8 @@
 
 const assert = require('assert');
 const _ = require('lodash');
-
-const USERS = {
-    '23121d3c-84df-44ac-b458-3d63a9a05497': {
-        email: 'foo@example.com',
-        email_verified: true,
-    },
-    'c2ac2b4a-2262-4e2f-847a-a40dd3c4dcd5': {
-        email: 'bar@example.com',
-        email_verified: false,
-    },
-};
+const User = require('../models/user');
+const DB = require('../database/config');
 
 class Account {
     constructor(id) {
@@ -21,8 +12,10 @@ class Account {
 
     // claims() should return or resolve with an object with claims that are mapped 1:1 to
     // what your OP supports, oidc-provider will cherry-pick the requested ones automatically
-    claims() {
-        return Object.assign({}, USERS[this.accountId], {
+    async claims() {
+        let user = await User.findOne({_id: this.accountId}).exec();
+        console.log("User inside account: " + JSON.stringify(user));
+        return Object.assign({}, user, {
             sub: this.accountId,
         });
     }
@@ -37,11 +30,10 @@ class Account {
         assert(password, 'password must be provided');
         assert(email, 'email must be provided');
         const lowercased = String(email).toLowerCase();
-        const id = _.findKey(USERS, { email: lowercased });
-        assert(id, 'invalid credentials provided');
-
-        // this is usually a db lookup, so let's just wrap the thing in a promise
-        return new this(id);
+        const user = await User.findOne({email: email}).exec();
+        console.log("User : " + JSON.stringify(user));
+        assert.equal(user.password, password, "Password did not match")
+        return new this(user._id);
     }
 }
 
