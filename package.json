@@ -16,7 +16,7 @@
     "express-urlrewrite": "^1.2.0",
     "ioredis": "^3.0.0",
     "lodash": "^4.17.4",
-    "mongoose": "^4.13.6",
+    "mongoose": "^4.13.21",
     "oidc-provider": "^2.8.0",
     "uuid": "^3.0.0"
   },
